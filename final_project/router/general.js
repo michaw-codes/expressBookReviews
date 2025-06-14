@@ -30,55 +30,91 @@ public_users.post("/register", (req,res) => {
     });
 });
 
+const getBooks = async () => {
+    // Simulating waiting for results of database query
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return books;
+}
+
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-    return res.status(300).json({message: books});
+public_users.get('/', async (req, res) => {
+    try {
+        // getBooks() simulates waiting for getting books from a Database
+        const books = await getBooks();
+        return res.status(200).json({ message: books });
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-    const isbn = parseInt(req.params.isbn);
-    if (isbn in books) {
-        return res.status(200).json({message: books[isbn]});
+public_users.get('/isbn/:isbn', async (req, res) => {
+    try {
+        const isbn = parseInt(req.params.isbn);
+        // getBooks() simulates waiting for getting books from a Database
+        const books = await getBooks();
+        if (isbn in books) {
+            return res.status(200).json({message: books[isbn]});
+        }
+        return res.status(404).json({message: "book not found"});
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.status(404).json({message: "book not found"});
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-    const author = req.params.author;
-    const selectedBooks = Object.fromEntries(
-        Object.entries(books).filter(
-            ([id, book]) => book.author.toLowerCase() === author.toLowerCase()
-        )
-    );
-    if (selectedBooks) {
-        return res.status(200).json({message: selectedBooks});
+public_users.get('/author/:author', async (req, res) => {
+    try {
+        const author = req.params.author;
+        // getBooks() simulates waiting for getting books from a Database
+        const books = await getBooks();
+        const selectedBooks = Object.fromEntries(
+            Object.entries(books).filter(
+                ([id, book]) => book.author.toLowerCase() === author.toLowerCase()
+            )
+        );
+        if (selectedBooks) {
+            return res.status(200).json({message: selectedBooks});
+        }
+        return res.status(404).json({message: "no books found for the selected author"});
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.status(404).json({message: "no books found for the selected author"});
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-    const title = req.params.title;
-    const selectedBooks = Object.fromEntries(
-        Object.entries(books).filter(
-            ([id, book]) => book.title.toLowerCase() === title.toLowerCase()
-        )
-    );
-    if (selectedBooks) {
-        return res.status(200).json({message: selectedBooks});
+public_users.get('/title/:title', async (req, res) => {
+    try {
+        const title = req.params.title;
+        // getBooks() simulates waiting for getting books from a Database
+        const books = await getBooks();
+        const selectedBooks = Object.fromEntries(
+            Object.entries(books).filter(
+                ([id, book]) => book.title.toLowerCase() === title.toLowerCase()
+            )
+        );
+        if (selectedBooks) {
+            return res.status(200).json({message: selectedBooks});
+        }
+        return res.status(404).json({message: "no books found with the selected title"});
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.status(404).json({message: "no books found with the selected title"});
 });
 
 //  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-    const isbn = parseInt(req.params.isbn);
-    if (isbn in books) {
-        return res.status(200).json({message: { reviews: books[isbn].reviews}});
+public_users.get('/review/:isbn', async (req, res) => {
+    try {
+        const isbn = parseInt(req.params.isbn);
+        // getBooks() simulates waiting for getting books from a Database
+        const books = await getBooks();
+        if (isbn in books) {
+            return res.status(200).json({message: { reviews: books[isbn].reviews}});
+        }
+        return res.status(404).json({message: "book not found"});
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-    return res.status(404).json({message: "book not found"});
 });
 
 module.exports.general = public_users;
